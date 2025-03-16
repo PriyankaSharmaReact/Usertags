@@ -120,36 +120,11 @@ function ut_enqueue_admin_scripts($hook) {
     if (in_array($hook, ['users.php', 'profile.php', 'user-edit.php', 'user-new.php'])) {
         wp_enqueue_script('select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js', ['jquery'], null, true);
         wp_enqueue_style('select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css');
+        wp_enqueue_script('ut-custom-js', plugin_dir_url(__FILE__) . 'usertags.js', ['jquery', 'select2-js'], null, true);
         wp_localize_script('ut-custom-js', 'ut_ajax', ['ajaxurl' => admin_url('admin-ajax.php')]);
     }
 }
 add_action('admin_enqueue_scripts', 'ut_enqueue_admin_scripts');
-
-// JavaScript for AJAX-powered tag search
-function ut_admin_scripts() {
-    ?>
-    <script>
-        jQuery(document).ready(function ($) {
-            $('#user_tags_select, #user_tag_filter').select2({
-                ajax: {
-                    url: ajaxurl,
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) {
-                        return { action: 'ut_search_user_tags', term: params.term };
-                    },
-                    processResults: function (data) {
-                        return { results: data };
-                    },
-                    cache: true
-                },
-                minimumInputLength: 2
-            });
-        });
-    </script>
-    <?php
-}
-add_action('admin_footer', 'ut_admin_scripts');
 
 // AJAX callback for fetching user tags dynamically
 function ut_search_user_tags() {
